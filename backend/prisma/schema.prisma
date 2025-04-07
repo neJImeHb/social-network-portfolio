@@ -22,6 +22,8 @@ model User {
   password String
   bioId    Int
   bio      Bio    @relation(fields: [bioId], references: [id], onDelete: Cascade)
+
+  @@index([email])
 }
 
 model Bio {

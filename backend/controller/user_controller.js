@@ -9,7 +9,7 @@ class UserController {
             const { name, surname, email, password } = req.body;
 
             if (!name || !surname || !email || !password) {
-                return res.status(400).json({ message: "Missing required fields" });
+                return res.json({ message: "Missing required fields" });
             }
 
             const hashed_password = await bcrypt.hash(password, 10);
@@ -28,7 +28,24 @@ class UserController {
             res.json(create_user);
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: "Error on the server" });
+            res.json({ message: "Error on the server" });
+        }
+    }
+
+    async getUser(req, res) {
+        try {
+            const { id } = req.body;
+
+            const user = await prisma.user.findFirst({
+                where: {
+                    id: id
+                }
+            })
+
+            res.json(user)
+        } catch (error) {
+            console.error(error)
+            res.json({ message: "Error on the server" });
         }
     }
 }
