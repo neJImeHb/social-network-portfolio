@@ -15,9 +15,9 @@ class UserController {
             const hashed_password = await bcrypt.hash(password, 10);
             const create_user = await prisma.user.create({
                 data: {
-                    name,
-                    surname,
-                    email,
+                    name: name,
+                    surname: surname,
+                    email: email,
                     password: hashed_password,
                     bio: {
                         create: { description: "" }

@@ -16,22 +16,43 @@ class AuthController {
             })
 
             if (!user) {
-                return res.json({auth_message: 'No user with this email address found'})
+                return res.json({ auth_message: 'No user with this email address found' })
             }
 
             const passwords_is_coincides = await bcrypt.compare(password, user.password)
 
             if (passwords_is_coincides) {
-                const token = jwt.sign({id: user.id}, process.env.JWT_SECRET, {expiresIn: '7d'})
-                res.json({user: user, token: token})
+                const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' })
+                res.json({ user: user, token: token })
             } else {
-                res.json({auth_message: 'Email does not coincide with password'})
+                res.json({ auth_message: 'Email does not coincide with password' })
             }
-
         } catch (error) {
             console.error(error)
             res.json({ message: "Error on the server" });
         }
+    }
+
+    async authToken(req, res, next) {
+        try {
+            const authHeader = req.headers['authorization'];
+            const token = authHeader && authHeader.split(' ')[1]; // "Bearer <token>"
+
+            if (!token) return res.status(401).json({ message: 'No token provided', is_logined: false });
+
+            jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+                if (err) return res.status(403).json({ message: 'Token is not valid', is_logined: false });
+                req.user = user;
+                next();
+            });
+        } catch (error) {
+            console.error(error)
+            return res.json({ message: "Error on the server" });
+        }
+    }
+
+    async protected(req, res) {
+        res.json({ user: req.user, is_logined: true })
     }
 }
 
