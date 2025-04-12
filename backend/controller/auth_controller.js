@@ -23,7 +23,7 @@ class AuthController {
 
             if (passwords_is_coincides) {
                 const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' })
-                res.json({ user: user, token: token })
+                res.json({ auth_message: "Successfully authorization", user: user, token: token })
             } else {
                 res.json({ auth_message: 'Email does not coincide with password' })
             }

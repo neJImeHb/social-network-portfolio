@@ -20,6 +20,13 @@ model User {
   surname  String
   email    String @unique
   password String
+  avatar_filename String?
+  background_filename String?
+  user_status String?
+  is_verificated Boolean @default(false)
+  online_status Boolean @default(false)
+  last_seen_date DateTime @default(now())
+  create_date DateTime @default(now())
   bioId    Int
   bio      Bio    @relation(fields: [bioId], references: [id], onDelete: Cascade)
 
