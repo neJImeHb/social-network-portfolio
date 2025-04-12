@@ -16,12 +16,14 @@ Response data: user
 
 ### /user/change_user_avatar
 Request header: <u>*authorization*</u> (Bearer Token)
+
 Request body: <u>*file*</u>
 
 Response data: <u>*message, avatar_filename*</u>
 
 ### /user/change_user_personal_data
 Request header: <u>*authorization*</u> (Bearer Token)
+
 Request body: <u>*username, name, surname, description*</u> (Примітка: у тіло запиту можна передавати навіть 1 поле)
 
 Response data: <u>*message, user*</u>
