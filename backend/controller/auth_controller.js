@@ -16,17 +16,18 @@ class AuthController {
             })
 
             if (!user) {
-                return res.json({ auth_message: 'No user with this email address found' })
+                return res.json({ auth_message: 'User is not found' })
             }
 
             const passwords_is_coincides = await bcrypt.compare(password, user.password)
 
-            if (passwords_is_coincides) {
-                const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' })
-                res.json({ auth_message: "Successfully authorization", user: user, token: token })
-            } else {
-                res.json({ auth_message: 'Email does not coincide with password' })
+            if (!passwords_is_coincides) {
+                return res.json({ auth_message: 'Email does not coincide with password' })
             }
+
+            const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' })
+            res.json({ auth_message: "Successfully authorization", user: user, token: token })
+
         } catch (error) {
             console.error(error)
             res.json({ message: "Error on the server" });

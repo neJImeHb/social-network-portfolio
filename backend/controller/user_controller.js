@@ -27,10 +27,7 @@ class UserController {
                     name: name,
                     surname: surname,
                     email: email,
-                    password: hashed_password,
-                    bio: {
-                        create: { description: "" }
-                    }
+                    password: hashed_password
                 }
             });
 
@@ -43,11 +40,11 @@ class UserController {
 
     async getUser(req, res) {
         try {
-            const { id } = req.body;
+            const { id } = req.params;
 
             const user = await prisma.user.findFirst({
                 where: {
-                    id: id
+                    id: Number(id)
                 }
             })
 
@@ -69,8 +66,6 @@ class UserController {
                 return res.status(400).json({ message: 'File not transferred' });
             }
 
-            console.log(file.size, maxSize)
-
             if (file.size > maxSize) {
                 return res.status(400).json({ message: 'Max file size is 5MB' })
             }
@@ -89,7 +84,7 @@ class UserController {
                     fs.unlinkSync(oldFilePath);
                 }
             }
-            console.log(file)
+            
             // Зберігаємо файл вручну з буфера
             fs.writeFileSync(filePath, file.buffer);
 

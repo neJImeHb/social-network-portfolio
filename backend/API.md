@@ -1,52 +1,54 @@
 # Server API Documentation
 
-*При помилці сервер завжди повертає <u>_message_</u>
+*При помилці сервер завжди повертає _message_
 
 ## /USER
 
 ### /user/create_user
-Request body: <u>*name, surname, email, password*</u>
+Request body: *name, surname, email, password*
 
 Response data: user
 
 ### /user/get_user
-Request body: <u>*id*</u>
+Request body: *id*
 
 Response data: user
 
 ### /user/change_user_avatar
-Request header: <u>*authorization*</u> (Bearer Token)
+Request header: *authorization* (Bearer Token)
+Request body: *file*
 
-Request body: <u>*file*</u>
-
-Response data: <u>*message, avatar_filename*</u>
+Response data: *message, avatar_filename*
 
 ### /user/change_user_personal_data
-Request header: <u>*authorization*</u> (Bearer Token)
+Request header: *authorization* (Bearer Token)
+Request body: *username, name, surname, description* (Примітка: у тіло запиту можна передавати навіть 1 поле)
 
-Request body: <u>*username, name, surname, description*</u> (Примітка: у тіло запиту можна передавати навіть 1 поле)
-
-Response data: <u>*message, user*</u>
+Response data: *message, user*
 
 
 
 ## /AUTH
 
 ### /auth/login
-Request body: <u>*email, password*</u>
+Request body: *email, password*
 
-Response data: <u>*user, token, auth_message*</u>
+Response data: *user, token, auth_message*
 
 ### /auth/protected
-Request header: <u>*authorization*</u> (Bearer Token)
+Request header: *authorization* (Bearer Token)
 
-Response data: <u>*user (id, iat, exp), is_login*</u>
+Response data: *user (id, iat, exp), is_login*
 
 
 
 ## /STATIC
 Адрес, за яким можна отримати статичні файли (зображення)
-Застосування:  &lt;img src={`${backendUrl}/static`} /&gl;
+
+Застосування:  
+```html 
+<img src={`${backendUrl}/static`} />
+```
 
 ### /profile_avatars/image_filename
 Наприклад: /profile_avatars/user_avatar-date-12345231-user_id-1.png
