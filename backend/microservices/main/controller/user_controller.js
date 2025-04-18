@@ -1,16 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 
 const prisma = new PrismaClient();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const uploadDir = path.join(__dirname, '../files/profile_avatars');
 
 class UserController {
     async createUser(req, res) {
@@ -27,7 +18,10 @@ class UserController {
                     name: name,
                     surname: surname,
                     email: email,
-                    password: hashed_password
+                    password: hashed_password,
+                    bio: {
+                        create: { description: "" }
+                    }
                 }
             });
 
@@ -38,15 +32,31 @@ class UserController {
         }
     }
 
-    async getUser(req, res) {
+    async get(req, res) {
         try {
-            const { id } = req.params;
+            const { id, email } = req.query;
 
-            const user = await prisma.user.findFirst({
-                where: {
-                    id: Number(id)
-                }
-            })
+            let user
+
+            if (id) {
+                user = await prisma.user.findFirst({
+                    where: {
+                        id: Number(id)
+                    }
+                })
+            } else if (email) {
+                user = await prisma.user.findFirst({
+                    where: {
+                        email: email
+                    }
+                })
+            } else {
+                return res.status(400).json({ message: 'ID and Email is missing' });
+            }
+
+            if (!user) {
+                return res.status(400).json({ message: 'User is undefined' });
+            }
 
             res.json(user)
         } catch (error) {
@@ -55,52 +65,29 @@ class UserController {
         }
     }
 
-    async changeUserAvatar(req, res) {
+    async changeAvatarFilename(req, res) {
         try {
-            const file = req.file;
-            const user_id = req.user.id
+            const { id, filename } = req.params;
 
-            const maxSize = 5 * 1024 * 1024 // 5mb
-
-            if (!file) {
-                return res.status(400).json({ message: 'File not transferred' });
+            if (!id || !filename) {
+                return res.status(400).json({ message: 'ID or filename is missing' });
             }
 
-            if (file.size > maxSize) {
-                return res.status(400).json({ message: 'Max file size is 5MB' })
-            }
-
-            const fileName = `user_avatar-date-${Date.now()}-user_id-${user_id}${path.extname(file.originalname)}`;
-            const filePath = path.join(uploadDir, fileName);
-
-            const user = await prisma.user.findUnique({
-                where: { id: user_id }
+            const current_user = await prisma.user.update({
+                where: { id: Number(id) },
+                data: {
+                    avatar_filename: filename
+                }
             });
 
-            // Якщо у користувача вже є аватар — видаляємо файл
-            if (user.avatar_filename) {
-                const oldFilePath = path.join(uploadDir, user.avatar_filename);
-                if (fs.existsSync(oldFilePath)) {
-                    fs.unlinkSync(oldFilePath);
-                }
-            }
-            
-            // Зберігаємо файл вручну з буфера
-            fs.writeFileSync(filePath, file.buffer);
-
-            await prisma.user.update({
-                where: {
-                    id: user_id
-                },
-                data: {
-                    avatar_filename: fileName
-                }
-            })
-
-            return res.json({ message: 'Avatar succesfully changed', avatar_filename: fileName });
+            res.json({ message: 'Avatar succesfully changed', avatar_filename: current_user.avatar_filename });
         } catch (error) {
-            console.error(error)
-            res.status(400).json({ message: "Error on the server" });
+            if (error.code === 'P2025') {
+                return res.status(400).json({ message: 'User not found' });
+            }
+
+            console.error(error);
+            res.status(400).json({ message: 'Server error' });
         }
     }
 
@@ -134,6 +121,8 @@ class UserController {
             res.status(400).json({ message: "Error on the server" });
         }
     }
+
+    async 
 }
 
 export default new UserController();

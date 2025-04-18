@@ -1,19 +1,15 @@
-import { PrismaClient } from "@prisma/client";
+import axios from "axios"
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
-
-const prisma = new PrismaClient();
+import dotenv from 'dotenv';
+dotenv.config();
 
 class AuthController {
     async login(req, res) {
         try {
             const { email, password } = req.body;
 
-            const user = await prisma.user.findFirst({
-                where: {
-                    email: email
-                }
-            })
+            const user = (await axios.get(`${process.env.MAIN_URL}/user/get?email=${email}`)).data
 
             if (!user) {
                 return res.json({ auth_message: 'User is not found' })
@@ -30,7 +26,7 @@ class AuthController {
 
         } catch (error) {
             console.error(error)
-            res.json({ message: "Error on the server" });
+            res.status(400).json({ message: "Error on the server" });
         }
     }
 
@@ -41,14 +37,15 @@ class AuthController {
 
             if (!token) return res.status(401).json({ message: 'No token provided', is_logined: false });
 
+
             jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
                 if (err) return res.status(403).json({ message: 'Token is not valid', is_logined: false });
                 req.user = user;
                 next();
             });
         } catch (error) {
-            console.error(error)
-            return res.json({ message: "Error on the server" });
+            console.error(error)    
+            return res.status(400).json({ message: "Error on the server" });
         }
     }
 
