@@ -1,15 +1,22 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
+import { schema } from "../components/zod_component.js";
 
 const prisma = new PrismaClient();
 
 class UserController {
-    async createUser(req, res) {
+    async create(req, res) {
         try {
             const { name, surname, email, password } = req.body;
 
             if (!name || !surname || !email || !password) {
                 return res.status(400).json({ message: "Missing required fields" });
+            }
+
+            const validate = schema.create_user.safeParse({ name, surname, email, password })
+
+            if (!validate.success) {
+                return res.status(400).json({ message: "Validation failed", validate_errors: validate.error.flatten().fieldErrors })
             }
 
             const hashed_password = await bcrypt.hash(password, 10);
@@ -91,10 +98,20 @@ class UserController {
         }
     }
 
-    async changeUserPersonalData(req, res) {
+    async changePersonalData(req, res) {
         try {
             const { username, name, surname, description } = req.body;
             const user_id = req.user.id;
+
+            if (!user_id) {
+                return res.status(400).json({message: 'User ID is missing'})
+            }
+
+            const validate = schema.change_user_personal_data.safeParse({ username, name, surname, description })
+
+            if (!validate.success) {
+                return res.status(400).json({ message: "Validation failed", validate_errors: validate.error.flatten().fieldErrors })
+            }
 
             const user = await prisma.user.update({
                 where: {
@@ -115,6 +132,10 @@ class UserController {
                 }
             })
 
+            if (!user) {
+                return res.status(400).json({message: 'User is undefined'})
+            }
+
             res.json({ message: "Data successfully updated", user: user })
         } catch (error) {
             console.error(error)
@@ -122,7 +143,7 @@ class UserController {
         }
     }
 
-    async 
+    async
 }
 
 export default new UserController();

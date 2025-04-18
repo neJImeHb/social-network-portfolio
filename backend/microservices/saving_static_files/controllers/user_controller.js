@@ -27,6 +27,10 @@ class UserController {
                 return res.status(400).json({ message: 'Max file size is 5MB' })
             }
 
+            if (!fs.existsSync(uploadDir)) {
+                fs.mkdirSync(uploadDir, { recursive: true });
+            }
+
             const fileName = `user_avatar-date-${Date.now()}-user_id-${user_id}${path.extname(file.originalname)}`;
             const filePath = path.join(uploadDir, fileName);
 

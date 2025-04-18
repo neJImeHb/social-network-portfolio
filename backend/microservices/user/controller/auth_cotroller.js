@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 class AuthCotroller {
-    async authMiddleware(req, res) {
+    async authMiddleware(req, res, next) {
         try {
             const authHeader = req.headers['authorization'];
 
@@ -11,7 +11,7 @@ class AuthCotroller {
                 return res.status(401).json({ message: 'Authorization header missing' });
             }
 
-            const response = await axios.post(`${process.env.AUTH_URL}/auth/protected`, {
+            const response = await axios.post(`${process.env.AUTH_URL}/auth/protected`, {}, {
                 headers: {
                     Authorization: authHeader,
                 },
@@ -25,7 +25,7 @@ class AuthCotroller {
             }
         } catch (error) {
             console.error(error)
-            res.json({ message: "Error on the server" });
+            res.status(400).json({ message: "Error on the server" });
         }
     }
 }
