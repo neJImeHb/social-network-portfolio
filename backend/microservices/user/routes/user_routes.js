@@ -4,9 +4,9 @@ import AuthController from '../controller/auth_cotroller.js';
 
 const UserRouter = new Router();
 
-UserRouter.post('/create_user', UserController.createUser);
+UserRouter.post('/create', UserController.create);
 UserRouter.get('/get', UserController.get);
-UserRouter.post('/change_user_personal_data', UserController.changeUserPersonalData);
+UserRouter.post('/change_personal_data', AuthController.authMiddleware, UserController.changePersonalData);
 UserRouter.post('/change_avatar_filename/:id/:filename', UserController.changeAvatarFilename);
 
 export default UserRouter;

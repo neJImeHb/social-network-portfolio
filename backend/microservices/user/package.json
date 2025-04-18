@@ -20,7 +20,8 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.2",
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "zod": "^3.24.3"
   },
   "devDependencies": {
     "prisma": "^6.5.0"

@@ -4,24 +4,24 @@
 
 ## :8000
 
-### /user/create_user
+### /user/create
 Request body: *name, surname, email, password*
 
-Response data: user
+Response data: *user, validate_errors (при неуспішній валідації)*
 
 ### /user/get
 Request query: *id, email*
 
-Response data: user
+Response data: *user*
 
 *Можна передавати навіть 1 параментр пошуку (наприклад: http://localhost:8000/user/get?email=sampleemail@gmail.com)
 
-### /user/change_user_personal_data
+### /user/change_personal_data
 Request header: *authorization* (Bearer Token)
 
 Request body: *username, name, surname, description* (Примітка: у тіло запиту можна передавати навіть 1 поле)
 
-Response data: *message, user*
+Response data: *message, user, validate_errors (при неуспішній валідації)*
 
 
 
