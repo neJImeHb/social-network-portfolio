@@ -39,12 +39,14 @@ class AuthController {
 
 
             jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-                if (err) return res.status(403).json({ message: 'Token is not valid', is_logined: false });
+                if (err) {
+                    return res.status(401).json({ message: 'Token is not valid', is_logined: false });
+                }
                 req.user = user;
                 next();
             });
         } catch (error) {
-            console.error(error)    
+            console.error(error)
             return res.status(400).json({ message: "Error on the server" });
         }
     }
